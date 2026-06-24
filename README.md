@@ -2,9 +2,7 @@
 
 **AI-powered pipeline for fusing heterogeneous geospatial datasets** (Satellite Imagery, LiDAR, GPR, GNSS, and TIFF files) to enable accurate land cover change detection and spatial analysis.
 
-![Project Banner](https://via.placeholder.com/800x400/0A2540/FFFFFF?text=Geospatial+Data+Fusion)  
-<!-- Replace with actual fusion result images later -->
-
+  
 ---
 
 ## 🎯 Overview
