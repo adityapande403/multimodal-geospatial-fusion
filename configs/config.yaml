@@ -1,0 +1,299 @@
+# Multimodal Geospatial Data Fusion Configuration
+# Author: Geospatial AI/ML Team
+# Version: 1.0.0
+
+# Data Configuration
+data:
+  # Input data paths
+  raw_data_path: './data/raw/'
+  processed_data_path: './data/processed/'
+  
+  # Supported modalities
+  modalities:
+    - satellite
+    - lidar
+    - gpr
+    - gnss
+    - aerial
+  
+  # TIFF file specifications
+  tiff:
+    format: 'GeoTIFF'
+    bands: [4, 3, 2]  # RGB bands for satellite
+    resolution: 0.5   # meters
+    crs: 'EPSG:4326'  # WGS84
+  
+  # Data normalization
+  normalization:
+    method: 'minmax'  # minmax, standardization, percentile
+    percentile_range: [2, 98]
+    clip_values: true
+
+# Preprocessing Configuration
+preprocessing:
+  # Co-registration parameters
+  co_registration:
+    enabled: true
+    method: 'phase_correlation'  # phase_correlation, mutual_information, gradient
+    max_shift: 50  # pixels
+    overlap_threshold: 0.8
+  
+  # Orthorectification
+  orthorectification:
+    enabled: true
+    dem_path: './data/dem/'
+    interpolation_method: 'bilinear'
+  
+  # Georeferencing
+  georeferencing:
+    auto_detect: true
+    metadata_source: 'tiff_geotags'
+  
+  # Resampling
+  resampling:
+    target_resolution: 0.5  # meters
+    method: 'bilinear'  # bilinear, cubic, nearest
+  
+  # Filtering
+  filtering:
+    enabled: true
+    bilateral_filter: true
+    sigma_spatial: 2.0
+    sigma_intensity: 0.1
+
+# Feature Extraction Configuration
+feature_extraction:
+  # Multi-scale decomposition
+  wavelet:
+    enabled: true
+    method: 'db4'  # Daubechies-4
+    levels: 3
+  
+  # Laplacian pyramid
+  laplacian_pyramid:
+    enabled: true
+    levels: 4
+  
+  # Spectral indices
+  indices:
+    - ndvi      # Normalized Difference Vegetation Index
+    - ndbi      # Normalized Difference Built-up Index
+    - ndmi      # Normalized Difference Moisture Index
+    - bsi       # Bare Soil Index
+  
+  # Texture features
+  texture:
+    enabled: true
+    methods: ['glcm', 'lbp']  # Gray-Level Co-occurrence Matrix, Local Binary Patterns
+    window_size: 5
+
+# Fusion Model Configuration
+model:
+  architecture: 'MultimodalCNNFusion'
+  
+  # Model parameters
+  params:
+    input_channels: 13  # Total channels from all modalities
+    num_modalities: 5
+    feature_dim: 256
+    num_layers: 4
+  
+  # Encoder configuration
+  encoder:
+    type: 'ResNet18'
+    pretrained: true
+    freeze_backbone: false
+    output_channels: 256
+  
+  # Attention mechanism
+  attention:
+    enabled: true
+    type: 'ChannelSpatialAttention'
+    reduction_ratio: 16
+  
+  # Cross-modal fusion
+  fusion:
+    method: 'concatenation'  # concatenation, addition, multiplication
+    attention_fusion: true
+    fusion_channels: 512
+  
+  # Decoder (for dense predictions)
+  decoder:
+    type: 'UNet'
+    skip_connections: true
+    output_channels: 1
+  
+  # Residual connections
+  residual:
+    enabled: true
+    skip_every_n_layers: 2
+  
+  # Batch normalization
+  batch_norm:
+    enabled: true
+    momentum: 0.1
+    epsilon: 1e-5
+
+# Training Configuration
+training:
+  # Optimization
+  optimizer: 'adam'  # adam, sgd, adamw
+  learning_rate: 0.001
+  weight_decay: 1e-5
+  momentum: 0.9
+  
+  # Learning rate scheduler
+  scheduler:
+    enabled: true
+    type: 'cosine'  # cosine, step, exponential
+    warmup_epochs: 5
+    total_epochs: 200
+  
+  # Batch and data
+  batch_size: 32
+  num_workers: 4
+  pin_memory: true
+  
+  # Loss function
+  loss:
+    primary: 'mse'  # mse, mae, huber
+    auxiliary: 'perceptual'
+    weights: [1.0, 0.1]
+  
+  # Regularization
+  regularization:
+    dropout: 0.3
+    label_smoothing: 0.1
+  
+  # Augmentation
+  augmentation:
+    enabled: true
+    transforms:
+      - random_rotation: 15
+      - random_flip: true
+      - random_brightness: 0.2
+      - random_contrast: 0.2
+  
+  # Checkpointing
+  checkpoint:
+    save_best: true
+    save_frequency: 10  # epochs
+    monitor_metric: 'val_rmse'
+    mode: 'min'
+
+# Evaluation Configuration
+evaluation:
+  # Metrics
+  metrics:
+    - rmse         # Root Mean Square Error
+    - mae          # Mean Absolute Error
+    - ssim         # Structural Similarity Index
+    - psnr         # Peak Signal-to-Noise Ratio
+    - correlation  # Pearson correlation
+    - entropy      # Information entropy
+  
+  # RMSE threshold (< 0.5m target)
+  rmse_threshold: 0.5
+  
+  # SSIM threshold (> 0.85 target)
+  ssim_threshold: 0.85
+  
+  # Uncertainty quantification
+  uncertainty:
+    enabled: true
+    method: 'monte_carlo'  # monte_carlo, bayesian
+    num_samples: 100
+  
+  # Validation
+  validation:
+    test_split: 0.2
+    val_split: 0.1
+    stratified: true
+    random_seed: 42
+
+# Change Detection Configuration
+change_detection:
+  # NDVI-based change detection
+  ndvi:
+    enabled: true
+    threshold: 0.1
+    temporal_analysis: true
+  
+  # Pixel-by-pixel comparison
+  pixel_comparison:
+    enabled: true
+    method: 'difference'  # difference, ratioed, chi_square
+    threshold: 0.05
+  
+  # Land cover transition
+  land_cover:
+    enabled: true
+    classes: ['water', 'vegetation', 'urban', 'agriculture', 'bare_soil']
+    transition_matrix: true
+  
+  # Temporal analysis
+  temporal:
+    enabled: true
+    window_size: 30  # days
+    confidence_level: 0.95
+
+# Export Configuration
+export:
+  # Model export formats
+  formats:
+    - onnx
+    - tensorflow_lite
+    - pytorch
+  
+  # ONNX settings
+  onnx:
+    opset_version: 13
+    optimize: true
+    quantization: true
+  
+  # TensorFlow Lite settings
+  tflite:
+    quantization: 'dynamic'  # dynamic, integer, float
+    target_ops: ['tflite_builtins']
+
+# Optimization Configuration
+optimization:
+  # Particle Swarm Optimization
+  pso:
+    enabled: true
+    population_size: 30
+    generations: 100
+    inertia_weight: 0.7
+    cognitive_param: 1.5
+    social_param: 1.5
+  
+  # Search space (for parameter tuning)
+  search_space:
+    learning_rate: [0.0001, 0.01]
+    batch_size: [16, 128]
+    dropout: [0.1, 0.5]
+
+# Logging Configuration
+logging:
+  level: 'INFO'  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  log_dir: './logs/'
+  tensorboard: true
+  wandb: false  # Weights & Biases integration
+
+# GPU Configuration
+gpu:
+  enabled: true
+  device_ids: [0]
+  mixed_precision: true
+  cudnn_benchmark: true
+
+# Paths
+paths:
+  project_root: './'
+  src_dir: './src/'
+  data_dir: './data/'
+  model_dir: './models/'
+  log_dir: './logs/'
+  output_dir: './outputs/'
+  checkpoint_dir: './checkpoints/'
