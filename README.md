@@ -498,31 +498,6 @@ If you use this project in your research, please cite:
 }
 ```
 
----
-
-## ❓ FAQ
-
-**Q: What data formats are supported?**
-A: Primary format is GeoTIFF (.tif, .tiff). See `src/preprocessing/tiff_loader.py` for format specifications.
-
-**Q: Can I use this without GPU?**
-A: Yes, but inference will be slower. GPU recommended for training.
-
-**Q: How much training data do I need?**
-A: Minimum 100-200 multi-temporal image pairs recommended for good generalization.
-
-**Q: Can I integrate custom modalities?**
-A: Yes! Extend `ModalityEncoder` in `src/fusion/model.py` for custom architectures.
-
----
-
-## 📞 Support
-
-- 📧 Email: research@geospatial-ai.example.com
-- 🐛 Issues: [GitHub Issues](https://github.com/adityapande403/multimodal-geospatial-fusion/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/adityapande403/multimodal-geospatial-fusion/discussions)
-
----
 
 ## 📜 License
 
@@ -530,13 +505,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ---
 
-## 🙏 Acknowledgments
 
-Built with:
-- **PyTorch** for deep learning
-- **Rasterio** & **GDAL** for geospatial I/O
-- **Scikit-image** for image processing
-- **NumPy & SciPy** for numerical computing
 
 ---
 
